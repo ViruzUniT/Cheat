@@ -21,7 +21,7 @@
   <ItemGroup>
     <ClCompile Include="Base.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="Sort.cpp" />
+    <ClCompile Include="old.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Base.h" />
@@ -36,7 +36,7 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>

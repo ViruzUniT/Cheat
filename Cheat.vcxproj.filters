@@ -21,7 +21,7 @@
     <ClCompile Include="Base.cpp">
       <Filter>Resource Files</Filter>
     </ClCompile>
-    <ClCompile Include="Sort.cpp">
+    <ClCompile Include="old.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
