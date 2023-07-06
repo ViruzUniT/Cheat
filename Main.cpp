@@ -1,6 +1,4 @@
-#include <Windows.h>
-#include <iostream>
-
+#include "Base.h"
 
 class Player
 {
