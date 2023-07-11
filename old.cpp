@@ -13,7 +13,7 @@ T Read(T offset) {
     return value;
 }
 
-/*template <typename T, typename V>
+template <typename T, typename V>
 void Read(T offset, V& value) {
     ReadProcessMemory(gHProcess, reinterpret_cast<LPVOID>(offset), &value, sizeof(value), nullptr);
 }
@@ -77,4 +77,14 @@ int main() {
 
     return 0;
 }
+
+      "MIMode": "gdb",
+      "miDebuggerPath": "gdb",
+      "setupCommands": [
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        }
+      ]
 */

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+/*#include "stdafx.h"
 
 DWORD GetProcId(const wchar_t* proc_name)
 {
@@ -59,3 +59,4 @@ uintptr_t FindDmaAddy(const HANDLE h_proc, const uintptr_t ptr, const std::vecto
 	return addr;
 }
 
+*/
