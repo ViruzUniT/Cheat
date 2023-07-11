@@ -12,19 +12,30 @@ public:
 };
 
 
-void injected_thread() {
-  Player* player = *(reinterpret_cast<Player**>(0x57E0A8));
-  while (true) {
-    player->health = 10;
+void injected_thread(const HMODULE instance) {
+    const uintptr_t client = reinterpret_cast<uintptr_t>(GetModuleHandle("ac_client.exe"));
 
-    Sleep(10);
-  }
+    Player* player = *(reinterpret_cast<Player**>(client + 0x17E0A8));
+    while (!GetAsyncKeyState(VK_INSERT)) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        player->health = 10;
+
+    }
+
+    // uninject
+    FreeLibraryAndExitThread(instance, EXIT_SUCCESS);
 }
 
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) {
   if (fdwReason == DLL_PROCESS_ATTACH) {
-    CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)injected_thread, NULL, 0, NULL);
-  }
+    DisableThreadLibraryCalls(hinstDLL);
 
+    const auto thread = CreateThread(nullptr, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(injected_thread), hinstDLL, 0, NULL);
+
+    if (thread) {
+        CloseHandle(thread);
+    }
+  }
+  
   return EXIT_SUCCESS;
 }
