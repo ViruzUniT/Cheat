@@ -1,5 +1,8 @@
 #include "Base.h"
 
+#define STATUS_INJECTED 0
+#define STATUS_UNINJECTED 1
+
 class Player {
 public:
     char pad_0000[118]; //0x0000
@@ -10,37 +13,52 @@ public:
     char pad_00F0[80]; //0x00F0
 };
 
-namespace game {
+namespace GameFunctions {
     constexpr uintptr_t printf = 0x4DAD50;
     using printf_t = void(*)(const char* format, ...);
 };
 
-void injected_thread(const HMODULE instance) {
-    const uintptr_t client = reinterpret_cast<uintptr_t>(GetModuleHandle(L"ac_client.exe"));
-    
-    const auto printf = reinterpret_cast<game::printf_t>(game::printf);
-    printf("Injected");
-    MessageBox(
-        NULL,
-        L"Injected",
-        L"MIAU",
-        MB_OK | MB_ICONASTERISK
-    );
+void SHOW_INJECTION_STATUS(const int status) {
+    const auto printf = reinterpret_cast<GameFunctions::printf_t>(GameFunctions::printf);
+    if (status == STATUS_INJECTED) {
+        printf("Injected");
+        MessageBoxW(
+            NULL,
+            L"Injected",
+            L"MIAU",
+            MB_OK | MB_ICONASTERISK
+        );
+    } else if (status == STATUS_UNINJECTED) {
+        printf("Uninjected");
+        MessageBoxW(
+            NULL,
+            L"Uninjected",
+            L"MIAU",
+            MB_OK | MB_ICONASTERISK
+        );
+    }
+}
 
+int GameLoop() {
+    const uintptr_t client = reinterpret_cast<uintptr_t>(GetModuleHandle(L"ac_client.exe"));
     Player* player = *(reinterpret_cast<Player**>(client + 0x17E0A8));
-    while (!GetAsyncKeyState(VK_INSERT)) {
+
+    while (true) {
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        if (GetAsyncKeyState(VK_INSERT))
+            return EXIT_SUCCESS;
+
         player->health = 10;
     }
+}
+
+void injected_thread(const HMODULE instance) {
+    SHOW_INJECTION_STATUS(STATUS_INJECTED);
+
+    int Loop = GameLoop();
 
     // uninject
-    MessageBox(
-        NULL,
-        L"Uninjected",
-        L"MIAU",
-        MB_OK | MB_ICONASTERISK
-    );
-    printf("uninjected");
+    SHOW_INJECTION_STATUS(STATUS_UNINJECTED);
     FreeLibraryAndExitThread(instance, EXIT_SUCCESS);
 }
 
