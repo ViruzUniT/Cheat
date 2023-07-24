@@ -26,3 +26,5 @@
 #include <dwmapi.h>
 #include <sstream>
 #include <string>
+#include "gui.h"
+#include "imgui/imgui.h"
