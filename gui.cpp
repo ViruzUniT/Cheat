@@ -1,6 +1,7 @@
 #include "Base.h"
 #include "imgui/imgui_impl_win32.h"
 #include "imgui/imgui_impl_dx9.h"
+#include <d3d9.h>
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(
 	HWND window,
@@ -77,7 +78,7 @@ void gui::CreateHWindow(const char* windowName) noexcept
 {
 	windowClass.cbSize = sizeof(WNDCLASSEX);
 	windowClass.style = CS_CLASSDC;
-	windowClass.lpfnWndProc = WindowProcess;
+	windowClass.lpfnWndProc = reinterpret_cast<WNDPROC>(WindowProcess);
 	windowClass.cbClsExtra = 0;
 	windowClass.cbWndExtra = 0;
 	windowClass.hInstance = GetModuleHandleA(0);
@@ -90,7 +91,7 @@ void gui::CreateHWindow(const char* windowName) noexcept
 
 	RegisterClassEx(&windowClass);
 
-	window = CreateWindowEx(
+	window = CreateWindowExW(
 		0,
 		L"class001",
 		reinterpret_cast<LPCWSTR>(windowName),
