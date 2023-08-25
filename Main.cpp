@@ -1,8 +1,9 @@
-#include "stdafx.h"
 #include "imgui/imgui.h"
 #include "gui.h"
 #include <corecrt_malloc.h>
-#include <vcruntime.h>
+#include <Windows.h>
+#include <cstdint>
+#include <thread>
 
 // for debugging
 #define ENABLE_LOG
@@ -16,7 +17,44 @@
 #define STATUS_INJECTED 0
 #define STATUS_UNINJECTED 1
 
+namespace GameFunctions {
+  constexpr uintptr_t big_printf = 0x45D890;
+  using big_printf_t = void(*)(const char* format, ...);
 
+  constexpr uintptr_t printf = 0x4DAD50;
+  using printf_t = void(*)(const char* format, ...);
+};
+const static GameFunctions::big_printf_t big_printf = reinterpret_cast<GameFunctions::big_printf_t>(GameFunctions::big_printf);
+const static GameFunctions::printf_t g_printf = reinterpret_cast<GameFunctions::printf_t>(GameFunctions::printf);
+
+struct AllocationMetrics {
+  uint32_t TotalAllocated = 0;
+  uint32_t TotalFreed = 0;
+  
+  uint32_t CurrendUsage() { return TotalAllocated - TotalFreed; }
+  void Allocade(size_t size) {
+    TotalAllocated += size;
+    g_printf("[-] Allocaded: %d Bytes", size);
+  }
+  void Deallocade(size_t size) {
+    TotalFreed += size;
+    g_printf("[-] Deallocaded %d Bytes", size);
+  }
+};
+
+static AllocationMetrics s_AllocationMetrics;
+
+void* operator new(size_t size) {
+  s_AllocationMetrics.Allocade(size);
+
+  return malloc(size);
+}
+
+void operator delete(void* memory, size_t size) {
+  s_AllocationMetrics.Deallocade(size);
+
+  free(memory);
+}
 
 class Vector3 {
 public:
@@ -52,14 +90,6 @@ public:
   char pad_00A4[8]; //0x00A4
 }; //Size: 0x00AC
 
-class AssaultRifle1 {
-public:
-  uint32_t ammo; //0x0000
-  char pad_0004[32]; //0x0004
-  uint32_t clip; //0x0024
-  char pad_0028[28]; //0x0028
-}; //Size: 0x0044
-
 class Pistol {
 public:
   uint32_t ammo; //0x0000
@@ -68,21 +98,13 @@ public:
   char pad_0028[32]; //0x0028
 }; //Size: 0x0048
 
-namespace GameFunctions {
-  constexpr uintptr_t big_printf = 0x45D890;
-  using big_printf_t = void(*)(const char* format, ...);
-
-  constexpr uintptr_t printf = 0x4DAD50;
-  using printf_t = void(*)(const char* format, ...);
-};
 
 void SHOW_INJECTION_STATUS(const int status) {
-  const GameFunctions::big_printf_t printf = reinterpret_cast<GameFunctions::big_printf_t>(GameFunctions::big_printf);
   if (status == STATUS_INJECTED) {
-    printf("Injected");
+    big_printf("Injected");
     //MessageBox(NULL, L"Injected", L"MIAU", MB_OK | MB_ICONASTERISK);
   } else if (status == STATUS_UNINJECTED) {
-    printf("Uninjected");
+    big_printf("Uninjected");
     //MessageBox(NULL, L"Uninjected", L"MIAU", MB_OK | MB_ICONASTERISK);
   }
 }
@@ -91,14 +113,8 @@ int uninject() {
   gui::DestroyImGui();
   gui::DestroyDevice();
   gui::DestroyHWindow();
-
+  
   return EXIT_SUCCESS;
-}
-
-void* CreateConsole() {
-  AllocConsole();
-  FILE* fp = nullptr;
-  freopen_s(&fp, "CONOUT", "w", stdout)
 }
 
 int GameLoop() {
@@ -130,8 +146,8 @@ int GameLoop() {
 
     ImGui::Text("Rifle");
     ImGui::Checkbox("Infinite Clip", &rifle_infiniteAmmo);
-    ImGui::SliderInt("Rifle Clip", reinterpret_cast<int*>(&player->p_weapons->p_assault1->clip), 0, 1000, "%d", ImGuiSliderFlags_AlwaysClamp);
-    ImGui::SliderInt("Rifle Ammo", reinterpret_cast<int*>(&player->p_weapons->p_assault1->ammo), 0, 1000, "%d", ImGuiSliderFlags_AlwaysClamp);
+    // ImGui::SliderInt("Rifle Clip", reinterpret_cast<int*>(&player->p_weapons->p_assault1->clip), 0, 1000, "%d", ImGuiSliderFlags_AlwaysClamp);
+    // ImGui::SliderInt("Rifle Ammo", reinterpret_cast<int*>(&player->p_weapons->p_assault1->ammo), 0, 1000, "%d", ImGuiSliderFlags_AlwaysClamp);
 
     ImGui::Text("Pistol");
     ImGui::Checkbox("Infinite", &pistol_infiniteAmmo);
@@ -143,11 +159,9 @@ int GameLoop() {
 
     if (invincible && isAlive) 
         player->health = 20;
-    if (rifle_infiniteAmmo && isAlive) 
-        player->p_weapons->p_assault1->clip = 20;
     if (pistol_infiniteAmmo && isAlive) 
         player->p_weapons->p_pistol->clip = 10;
-
+    
     if (GetAsyncKeyState(VK_INSERT) || ImGui::Button("Uninject")) {
       ImGui::End();
       gui::EndRender();
