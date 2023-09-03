@@ -1,6 +1,6 @@
 #include "imgui/imgui_impl_win32.h"
 #include "imgui/imgui_impl_dx9.h"
-#include "imgui/d3d9.h" 
+#include <d3d9.h>
 #include <winnt.h>
 #include "gui.h"
 
@@ -87,7 +87,7 @@ void gui::CreateHWindow(const char* windowName) noexcept
 	windowClass.hCursor = 0;
 	windowClass.hbrBackground = 0;
 	windowClass.lpszMenuName = 0;
-	windowClass.lpszClassName = reinterpret_cast<LPCSTR>(L"class001");
+	windowClass.lpszClassName = (L"class001");
 	windowClass.hIconSm = 0;
 
 	RegisterClassEx(&windowClass);
