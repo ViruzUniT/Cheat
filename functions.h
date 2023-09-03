@@ -9,5 +9,5 @@ namespace GameFunctions {
   constexpr uintptr_t printf = 0x4DAD50;
   using printf_t = void(*)(const char* format, ...);
 };
-const GameFunctions::big_printf_t big_printf = reinterpret_cast<GameFunctions::big_printf_t>(GameFunctions::big_printf);
-const GameFunctions::printf_t g_printf = reinterpret_cast<GameFunctions::printf_t>(GameFunctions::printf);
+const GameFunctions::big_printf_t bigPrintf = reinterpret_cast<GameFunctions::big_printf_t>(GameFunctions::big_printf);
+const GameFunctions::printf_t gPrintf = reinterpret_cast<GameFunctions::printf_t>(GameFunctions::printf);

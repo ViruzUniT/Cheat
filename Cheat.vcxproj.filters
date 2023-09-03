@@ -83,9 +83,6 @@
     <ClInclude Include="gui.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="imgui\imgui_impl_dx11.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="classes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -94,6 +91,9 @@
     </ClInclude>
     <ClInclude Include="debug.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imgui_impl_dx11.h">
+      <Filter>imgui</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
