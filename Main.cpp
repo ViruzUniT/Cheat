@@ -5,6 +5,8 @@
 #include "imgui/imgui.h"
 #include <Windows.h>
 #include <cstdint>
+#include <securitybaseapi.h>
+#include <stdio.h>
 #include <thread>
 
 #define STATUS_INJECTED 0
@@ -29,8 +31,10 @@ int uninject() {
   return EXIT_SUCCESS;
 }
 
-void RenderPlayer(GameClasses::Player *&player) {
+void RenderPlayer(GameClasses::Player *&player,
+                  GameClasses::MyPlayer &myPlayer) {
   ImGui::Text("Player");
+  ImGui::Checkbox("Invincible", &myPlayer.invincible);
   ImGui::SliderInt("Health", &player->health, 0, 1000, "%d",
                    ImGuiSliderFlags_AlwaysClamp);
 
@@ -55,6 +59,7 @@ int GameLoop() {
       *(reinterpret_cast<GameClasses::PlayerList **>(client + 0x18AC04));
   GameClasses::MyPlayer myPlayerList[32];
   const uint8_t *MatchSize = reinterpret_cast<uint8_t *>(client + 0x18AC0C);
+  CreateConsole();
   // player + 205 = name
   // player array = ac_client.exe + 18AC04
   // match size = ac_client.exe + 18AC0C
@@ -82,7 +87,8 @@ int GameLoop() {
     if (ImGui::CollapsingHeader("Player")) {
       if (ImGui::BeginTable("split", 1)) {
         ImGui::TableNextColumn();
-        RenderPlayer(player);
+        myPlayerList[0].Name = player->Name;
+        RenderPlayer(player, myPlayerList[0]);
         ImGui::EndTable();
       }
     }
@@ -91,10 +97,11 @@ int GameLoop() {
       if (ImGui::BeginTable("splitter", 1)) {
         ImGui::TableNextColumn();
         for (int i = 0; i < *MatchSize - 1; i++) {
+          myPlayerList[i + 1].Name = playerList->Players[i]->Name;
           if (ImGui::CollapsingHeader(playerList->Players[i]->Name)) {
             if (ImGui::BeginTable(playerList->Players[i]->Name, 1)) {
               ImGui::TableNextColumn();
-              RenderPlayer(playerList->Players[i]);
+              RenderPlayer(playerList->Players[i], myPlayerList[i + 1]);
               ImGui::EndTable();
             }
             ImGui::TableNextRow();
@@ -125,6 +132,7 @@ int GameLoop() {
   playerList = nullptr;
   player = nullptr;
   MatchSize = nullptr;
+  FreeConsole();
 
   return uninject();
 }

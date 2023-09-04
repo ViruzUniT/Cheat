@@ -92,5 +92,16 @@
     <ClInclude Include="imgui\d3d9.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\MinHook.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\MinHook.x64.dll" />
+    <None Include="bin\MinHook.x86.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="bin\MinHook.x64.lib" />
+    <Library Include="bin\MinHook.x86.lib" />
   </ItemGroup>
 </Project>
