@@ -7,18 +7,6 @@ struct Vector3 {
 };
 
 namespace GameClasses {
-struct MyPlayer {
-  std::string Name;
-  bool invincible;
-  bool isAlive;
-  bool rifle_infiniteAmmo;
-  bool pistol_infiniteAmmo;
-
-  MyPlayer()
-      : invincible(false), isAlive(false), rifle_infiniteAmmo(false),
-        pistol_infiniteAmmo(false) {}
-};
-
 class Player {
 public:
   char pad_0000[4];          // 0x0000
@@ -63,4 +51,16 @@ public:
   int clip;          // 0x0024
   char pad_0028[32]; // 0x0028
 };                   // Size: 0x0048
+struct MyPlayer {
+  std::string Name;
+  bool invincible;
+  bool isAlive;
+  bool rifle_infiniteAmmo;
+  bool pistol_infiniteAmmo;
+  Player *player;
+
+  MyPlayer()
+      : invincible(false), isAlive(false), rifle_infiniteAmmo(false),
+        pistol_infiniteAmmo(false) {}
+};
 } // namespace GameClasses

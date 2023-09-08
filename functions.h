@@ -1,6 +1,8 @@
 #pragma once
 
+#include <Windows.h>
 #include <cstdint>
+#include <minwindef.h>
 #include <vadefs.h>
 
 namespace GameFunctions {
@@ -15,5 +17,5 @@ const big_printf_t bigPrintf =
 const printf_t gPrintf =
     reinterpret_cast<GameFunctions::printf_t>(GameFunctions::printf);
 
-constexpr uintptr_t Shoot = 0x4C7200;
+const uintptr_t Shoot = 0xC7200;
 }; // namespace GameFunctions

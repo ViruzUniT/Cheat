@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <cstdio>
 #include <iostream>
+#include <minwindef.h>
 #include <stdio.h>
 #include <thread>
 
@@ -24,6 +25,12 @@ void SHOW_INJECTION_STATUS(const int status) {
   }
 }
 
+GameClasses::Player *gcurrentPlayer = nullptr;
+GameClasses::Player *GetCurrentPlayerPointer() { return gcurrentPlayer; }
+void SetCurrentPlayerPointer(GameClasses::Player *currentPlayer) {
+  gcurrentPlayer = currentPlayer;
+}
+
 int uninject() {
   gui::DestroyImGui();
   gui::DestroyDevice();
@@ -32,10 +39,23 @@ int uninject() {
   return EXIT_SUCCESS;
 }
 
+char(__fastcall *O_Shoot)(DWORD *, int);
+char __stdcall Shoot_Hook(DWORD *__this, int a2) {
+  printf("%d", a2);
+  return O_Shoot(__this, a2);
+}
+
+void FunctionManager(GameClasses::Player *&player,
+                     GameClasses::MyPlayer &myPlayer) {
+  // infinite Ammo
+}
+
 void RenderPlayer(GameClasses::Player *&player,
                   GameClasses::MyPlayer &myPlayer) {
   if (player->Name != myPlayer.Name)
     return;
+
+  SetCurrentPlayerPointer(player);
 
   ImGui::Text("Player");
   ImGui::Checkbox("Invincible", &myPlayer.invincible);
@@ -49,6 +69,7 @@ void RenderPlayer(GameClasses::Player *&player,
   ImGui::Text("%f", player->body_coords.z);
 
   ImGui::Text("Pistol");
+  ImGui::Checkbox("Infinite Clip", &myPlayer.pistol_infiniteAmmo);
   ImGui::SliderInt("Clip", &player->p_weapons->p_pistol->clip, 0, 1000, "%d",
                    ImGuiSliderFlags_AlwaysClamp);
   ImGui::SliderInt("Ammo", &player->p_weapons->p_pistol->ammo, 0, 1000, "%d",
@@ -57,6 +78,8 @@ void RenderPlayer(GameClasses::Player *&player,
   ImGui::Text("Gadgets");
   ImGui::SliderInt("Granates", &player->grenades, 0, 100, "%d",
                    ImGuiSliderFlags_AlwaysClamp);
+
+  FunctionManager(player, myPlayer);
 }
 
 int GameLoop() {
@@ -102,6 +125,7 @@ int GameLoop() {
       if (ImGui::BeginTable("split", 1)) {
         ImGui::TableNextColumn();
         myPlayerList[0].Name = player->Name;
+
         RenderPlayer(player, myPlayerList[0]);
         ImGui::EndTable();
       }
