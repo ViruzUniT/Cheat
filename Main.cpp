@@ -5,7 +5,8 @@
 #include "imgui/imgui.h"
 #include <Windows.h>
 #include <cstdint>
-#include <securitybaseapi.h>
+#include <cstdio>
+#include <iostream>
 #include <stdio.h>
 #include <thread>
 
@@ -33,10 +34,19 @@ int uninject() {
 
 void RenderPlayer(GameClasses::Player *&player,
                   GameClasses::MyPlayer &myPlayer) {
+  if (player->Name != myPlayer.Name)
+    return;
+
   ImGui::Text("Player");
   ImGui::Checkbox("Invincible", &myPlayer.invincible);
   ImGui::SliderInt("Health", &player->health, 0, 1000, "%d",
                    ImGuiSliderFlags_AlwaysClamp);
+  ImGui::Text("Coords");
+  ImGui::Text("%f", player->body_coords.x);
+  ImGui::SameLine();
+  ImGui::Text("%f", player->body_coords.y);
+  ImGui::SameLine();
+  ImGui::Text("%f", player->body_coords.z);
 
   ImGui::Text("Pistol");
   ImGui::SliderInt("Clip", &player->p_weapons->p_pistol->clip, 0, 1000, "%d",
@@ -59,7 +69,11 @@ int GameLoop() {
       *(reinterpret_cast<GameClasses::PlayerList **>(client + 0x18AC04));
   GameClasses::MyPlayer myPlayerList[32];
   const uint8_t *MatchSize = reinterpret_cast<uint8_t *>(client + 0x18AC0C);
-  CreateConsole();
+
+  AllocConsole();
+  FILE *f;
+  freopen_s(&f, "CONOUT$", "w", stdout);
+
   // player + 205 = name
   // player array = ac_client.exe + 18AC04
   // match size = ac_client.exe + 18AC0C
@@ -132,7 +146,9 @@ int GameLoop() {
   playerList = nullptr;
   player = nullptr;
   MatchSize = nullptr;
-  FreeConsole();
+
+  printf("Uninjected\n");
+  Blyat(f);
 
   return uninject();
 }

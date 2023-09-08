@@ -3,7 +3,9 @@
 #include <Windows.h>
 #include <cstdint>
 #include <cstdio>
+#include <iostream>
 #include <stdio.h>
+#include <string>
 
 struct AllocationMetrics {
   uint32_t TotalAllocated = 0;
@@ -12,15 +14,16 @@ struct AllocationMetrics {
   uint32_t CurrendUsage() { return TotalAllocated - TotalFreed; }
   void Allocade(size_t size) {
     TotalFreed += size;
-    printf("[-] Deallocaded %d Bytes", size);
+    printf("[-] Deallocaded %zu Bytes", size);
   }
   void Deallocade(size_t size) {
     TotalAllocated += size;
-    printf("[-] Allocaded: %d Bytes", size);
+    printf("Allocaded: %zu Bytes", size);
   }
 };
-inline void CreateConsole() {
-  AllocConsole();
-  FILE *f;
-  freopen_s(&f, "CONOUT$", "w", stdout);
+
+inline void Blyat(FILE *f) {
+  if (f == nullptr)
+    fclose(f);
+  FreeConsole();
 }
