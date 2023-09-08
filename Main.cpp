@@ -15,11 +15,11 @@
 
 void SHOW_INJECTION_STATUS(const int status) {
   if (status == STATUS_INJECTED) {
-    bigPrintf("Press Insert to uninject");
-    bigPrintf("Injected");
+    GameFunctions::bigPrintf("Press Insert to uninject");
+    GameFunctions::bigPrintf("Injected");
     // MessageBox(NULL, L"Injected", L"MIAU", MB_OK | MB_ICONASTERISK);
   } else if (status == STATUS_UNINJECTED) {
-    bigPrintf("Uninjected");
+    GameFunctions::bigPrintf("Uninjected");
     // MessageBox(NULL, L"Uninjected", L"MIAU", MB_OK | MB_ICONASTERISK);
   }
 }
@@ -148,7 +148,10 @@ int GameLoop() {
   MatchSize = nullptr;
 
   printf("Uninjected\n");
-  Blyat(f);
+
+  if (f != nullptr)
+    fclose(f);
+  FreeConsole();
 
   return uninject();
 }

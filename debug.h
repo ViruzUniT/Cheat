@@ -21,9 +21,3 @@ struct AllocationMetrics {
     printf("Allocaded: %zu Bytes", size);
   }
 };
-
-inline void Blyat(FILE *f) {
-  if (f == nullptr)
-    fclose(f);
-  FreeConsole();
-}
